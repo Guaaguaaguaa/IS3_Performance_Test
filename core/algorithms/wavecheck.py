@@ -42,7 +42,7 @@ class WaveCheckAlgorithm:
             else:
                 intervals = np.array([])
                 mean_interval = np.nan
-            info = {f'mean_interval = {mean_interval}'}
+            info = [f"mean_interval = {mean_interval:.6f}"]
             interval_label = make_output_name(serial, "wavecheck", "interval")
             curves.append((first_wl[:-1], intervals, interval_label, info, False, True))  # skip_csv=False, skip_png=True
 

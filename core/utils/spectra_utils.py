@@ -51,8 +51,15 @@ def unify_records(records):
     else:
         final_it = it_list  # 保持原顺序
 
+    # 保留第一条记录的 filename 和 subfolder（用于命名）
+    extra = {}
+    for k in ("filename", "subfolder"):
+        if k in records[0]:
+            extra[k] = records[0][k]
+
     return [{
         "wavelength": base_wl,
         "data": final_data,
-        "it": final_it
+        "it": final_it,
+        **extra,
     }]

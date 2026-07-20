@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 from core.algorithms.reflectance_core import load_wr_and_compute_reflectance
 from core.export.naming import make_output_name
@@ -25,6 +26,7 @@ class StraylightAlgorithm:
 
         curves = []
         logs = []
+        detail = ""
 
         for i, res in enumerate(ref_results):
 
@@ -39,8 +41,13 @@ class StraylightAlgorithm:
             wl_cut = wl[mask_plot]
             trans_cut = trans[mask_plot]
 
-            stem = os.path.splitext(os.path.basename(filenames[i]))[0]
-            label = make_output_name(serial, "straylight", stem)
+            raw = os.path.splitext(os.path.basename(filenames[i]))[0]
+            # 去掉无意义的 _UP 后缀，截取滤光片名（最后一段，去数字）
+            if raw.endswith("_UP"):
+                raw = raw[:-3]
+            detail = raw.rsplit("_", 1)[-1] if "_" in raw else raw
+            detail = re.sub(r'\d+$', '', detail)
+            label = make_output_name(serial, "straylight", detail)
 
             curves.append((wl_cut, trans_cut, label, f"550-750 nm straylight_mean = {mean_val:.6e}"))
 
@@ -49,5 +56,6 @@ class StraylightAlgorithm:
         return {
             "type": "straylight",
             "curves": curves,
-            "log": "\n".join(logs)
+            "log": "\n".join(logs),
+            "detail": detail,
         }

@@ -7,7 +7,7 @@ import os
 
 from core.io.spectral_reader import read_spectral_files
 from core.utils.spectra_utils import unify_records
-from core.export.naming import make_output_name
+from core.export.naming import make_output_name, extract_detail_from_folder
 
 
 class RadCalAlgorithm:
@@ -39,12 +39,14 @@ class RadCalAlgorithm:
 
         curves = []
         log_msgs = []
+        detail = ""
 
         for rec in records:
             wl = rec["wavelength"]
             data = rec["data"]
             IT_test = rec.get("it", 12)
-            stem = os.path.splitext(os.path.basename(rec["filename"]))[0]
+            folder = rec.get("subfolder", "")
+            detail = extract_detail_from_folder(folder, "radcal")
 
             if dark is not None:
                 if dark.ndim == 1:
@@ -59,12 +61,13 @@ class RadCalAlgorithm:
 
             sample_rad = data * cal / IT_test
             sample_rad = np.asarray(sample_rad).ravel()
-            label = make_output_name(serial, "radcal", stem)
+            label = make_output_name(serial, "radcal", detail) if detail else make_output_name(serial, "radcal")
             curves.append((wl, sample_rad, label))
-            log_msgs.append(f"{stem} 处理完成，使用 Cal 文件: {os.path.basename(cal_path)}")
+            log_msgs.append(f"{detail} 处理完成，使用 Cal 文件: {os.path.basename(cal_path)}")
 
         return {
             "type": "rad",
             "curves": curves,
-            "log": "\n".join(log_msgs)
+            "log": "\n".join(log_msgs),
+            "detail": detail,
         }

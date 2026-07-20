@@ -1,7 +1,8 @@
+import os
 import numpy as np
 
 from core.utils.spectra_utils import unify_records
-from core.export.naming import make_output_name
+from core.export.naming import make_output_name, extract_detail_from_folder
 
 
 class NEDLAlgorithm:
@@ -32,11 +33,14 @@ class NEDLAlgorithm:
             rad = rad / 10000
 
             nedl = np.std(rad, axis=0)
-            label = make_output_name(serial, "nedl")
+            folder = rec.get("subfolder", "")
+            detail = extract_detail_from_folder(folder, "nedl")
+            label = make_output_name(serial, "nedl", detail) if detail else make_output_name(serial, "nedl")
             curves.append((wl, nedl, label))
 
         return {
             "type": "nedl",
             "curves": curves,
-            "log": "NEDL 计算完成"
+            "log": "NEDL 计算完成",
+            "detail": detail,
         }

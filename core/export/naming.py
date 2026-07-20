@@ -3,6 +3,8 @@ naming.py — 统一输出文件命名
 所有算法通过 make_output_name() 构造 label，保证命名一致。
 """
 
+import re
+
 
 def make_output_name(serial, test_type, *parts):
     """
@@ -31,3 +33,14 @@ def make_output_name(serial, test_type, *parts):
     if parts:
         base += "_" + "_".join(str(p) for p in parts if p)
     return base
+
+
+def extract_detail_from_folder(folder_name, test_type=""):
+    """
+    从文件夹名提取有意义的标识。
+    去掉 Data-/data_/Data_/data- 前缀；如果结果等于测试项名（如 SNR），返回空。
+    """
+    detail = re.sub(r'^[Dd]ata[-_]', '', folder_name) if folder_name else ""
+    if detail.lower() == test_type.lower():
+        return ""
+    return detail

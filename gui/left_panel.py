@@ -266,6 +266,7 @@ class LeftPanel(ttk.Frame):
             for p, r in zip(self.current_paths, raw):
                 r = dict(r)
                 r["filename"] = Path(p).name
+                r["subfolder"] = Path(p).parent.name
                 results.append(r)
             return results
 

@@ -138,4 +138,4 @@ class WavecalAlgorithm:
         diag_lines.append(f"RMS = {rms:.4f} nm, 使用 {len(peak_detail)} 个峰")
         log_msg = "\n".join(diag_lines)
 
-        return {"type": "wavecal", "curves": curves, "log": log_msg}
+        return {"type": "wavecal", "curves": curves, "log": log_msg, "detail": ""}

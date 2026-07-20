@@ -23,6 +23,7 @@ class ReflectanceAlgorithm:
 
         curves = []
         logs = []
+        detail = ""
 
         ref_results = load_wr_and_compute_reflectance(records, dark)
 
@@ -32,6 +33,7 @@ class ReflectanceAlgorithm:
             ref = res["reflectance"]
 
             stem = os.path.splitext(os.path.basename(filenames[i]))[0]
+            detail = stem
             label = make_output_name(serial, "reflectance", stem)
 
             curves.append((wl, ref, label))
@@ -40,5 +42,6 @@ class ReflectanceAlgorithm:
         return {
             "type": "ref",
             "curves": curves,
-            "log": "\n".join(logs)
+            "log": "\n".join(logs),
+            "detail": detail,
         }

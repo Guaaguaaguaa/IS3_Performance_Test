@@ -1,8 +1,9 @@
 # core/algorithms/snr.py
 
+import os
 import numpy as np
 from core.utils.spectra_utils import unify_records
-from core.export.naming import make_output_name
+from core.export.naming import make_output_name, extract_detail_from_folder
 
 
 class SNRAlgorithm:
@@ -47,11 +48,15 @@ class SNRAlgorithm:
 
             dns_stdev[dns_stdev == 0] = 1e-12
             snr = dns_mean / dns_stdev
-            label = make_output_name(serial, "snr")
-            curves.append((wl, snr, label))
-
             snr_max = np.max(snr)
             snr_mean = np.mean(snr)
+
+            folder = rec.get("subfolder", "")
+            detail = extract_detail_from_folder(folder, "snr")
+            label = make_output_name(serial, "snr", detail) if detail else make_output_name(serial, "snr")
+            info = [f"SNR Max = {snr_max:.3f}", f"SNR Mean = {snr_mean:.3f}"]
+            curves.append((wl, snr, label, info))
+
             log_msgs.append(f"{rec.get('filename', 'SNR')} SNR Max: {snr_max:.3f}, Mean: {snr_mean:.3f}")
 
-        return {"type": "snr", "curves": curves, "log": "\n".join(log_msgs)}
+        return {"type": "snr", "curves": curves, "log": "\n".join(log_msgs), "detail": detail}

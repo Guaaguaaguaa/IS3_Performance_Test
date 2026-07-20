@@ -285,19 +285,41 @@ class RightPanel(ttk.Frame):
 
             # ===== 绘图与保存 =====
             if curves:
-                save_spectra_csv(curves, self.output_folder.get(),
-                                skip_info=(algo_type == "wavecal"))
+                out_dir = self.output_folder.get()
+                save_spectra_csv(curves, out_dir)
+
+                serial = self.serial_number.get()
+                algo_name = self.current_algorithm_name.lower()
+
+                # ── 统一 report：所有 curve 的 info → {serial}_{algo}_report.txt ──
+                lines = []
+                for c in curves:
+                    info = c[3] if len(c) >= 4 else None
+                    if info is None:
+                        continue
+                    if isinstance(info, (list, tuple)):
+                        lines.extend(str(x) for x in info)
+                    elif isinstance(info, dict):
+                        lines.extend(f"{k}: {v}" for k, v in info.items())
+                    else:
+                        lines.append(str(info))
+                if lines and serial:
+                    name = make_output_name(serial, algo_name, "report")
+                    report_path = os.path.join(out_dir, f"{name}.txt")
+                    os.makedirs(out_dir, exist_ok=True)
+                    with open(report_path, "w", encoding="utf-8") as f:
+                        f.write("\n".join(lines) + "\n")
 
                 # PNG：仅当存在非 skip_png 的曲线时才保存
                 has_visible = any(
                     not (len(c) >= 6 and c[5]) for c in curves)
                 save_path = None
                 if has_visible:
-                    serial = self.serial_number.get()
-                    png_label = (make_output_name(serial, self.current_algorithm_name.lower())
-                                 if serial else self.current_algorithm_name)
+                    base = make_output_name(serial, algo_name) if serial else algo_name
+                    detail = result.get("detail", "")
+                    png_label = f"{base}_{detail}" if detail else base
                     safe_label = "".join(c if c.isalnum() or c in "_-" else "_" for c in png_label)
-                    save_path = os.path.join(self.output_folder.get(), f"{safe_label}.png")
+                    save_path = os.path.join(out_dir, f"{safe_label}.png")
 
                 self._plot_result(result, save_path=save_path)
                 saved = True

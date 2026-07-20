@@ -88,5 +88,6 @@ class NonLinearAlgorithm:
         return {
             "type": "nonlinear",
             "curves": curves_main,
-            "log": log_msg
+            "log": log_msg,
+            "detail": f"{wl_max:.0f}nm",
         }
