@@ -1,0 +1,8 @@
+dist/
+build/
+__pycache__/
+*.pyc
+results/
+output/
+legacy/SpecWaveCal_HH3/
+打包代码.txt
